@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Set-Location *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/servers\" -Method GET 2>&1)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3001/servers\" -Method GET)"
+    ]
+  }
+}

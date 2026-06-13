@@ -1,0 +1,13 @@
+services:
+  toolhub:
+    build: .
+    image: toolhub:local
+    ports:
+      - "3000:3000"
+    volumes:
+      - toolhub-data:/app/data
+    environment:
+      - PORT=3000
+
+volumes:
+  toolhub-data:
