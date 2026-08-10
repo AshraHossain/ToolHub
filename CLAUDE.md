@@ -19,13 +19,27 @@ npm start
 
 # Seed the database with 4 example MCP servers + tools
 npm run seed
+
+# Docker (persists data/ as a named volume)
+docker-compose up
 ```
 
-No test framework is configured yet.
+No test framework is configured yet. CI runs: `npm run build` → `npm run seed` → start server + `curl` smoke tests → Docker image build.
+
+Server listens on port 3000 by default; override with `PORT=<n>`.
 
 ## Architecture
 
 ToolHub is a REST API server that acts as a central registry and governance layer for MCP (Model Context Protocol) servers. Agents discover and invoke tools through ToolHub rather than connecting to MCP servers directly.
+
+### Startup sequence
+
+```
+initSchema()           ← creates data/ dir + empty JSON files if absent
+rbac.ensureDefaultRoles()  ← bootstraps admin + agent roles
+createApp()            ← mounts all Express routes
+startHealthMonitor(60_000) ← background setInterval health pings
+```
 
 ### Request flow
 
@@ -40,6 +54,35 @@ Agent → POST /invoke (x-principal-id header)
            ↓
       analytics.logUsage (fire-and-forget)
 ```
+
+### API surface
+
+| Method | Route | Auth required | Purpose |
+|---|---|---|---|
+| `POST` | `/servers` | manage `*` | Register an MCP server |
+| `GET` | `/servers` | — | List all servers |
+| `PATCH` | `/servers/:id` | manage server | Update server metadata |
+| `DELETE` | `/servers/:id` | manage server | Delete server + cascade-delete its tools |
+| `POST` | `/servers/:id/tools` | manage server | Register a tool on a server |
+| `GET` | `/tools` | — | List all tools |
+| `GET` | `/discover` | discover `*` | Filter tools by `?tag=`, `?serverId=`, `?query=` |
+| `POST` | `/invoke` | invoke tool | Call a tool (mocked); gated by RBAC + approvals |
+| `GET` | `/health` | — | Overview of all server health |
+| `GET` | `/servers/:id/health` | — | Latest + history for one server |
+| `POST` | `/approvals` | — | Request approval to invoke a medium/high-risk tool |
+| `GET` | `/approvals` | manage `*` | List approval requests |
+| `POST` | `/approvals/:id/decision` | manage `*` | Approve or deny a request |
+| `GET` | `/analytics/usage` | — | Query usage events |
+| `GET` | `/analytics/summary` | — | Aggregated usage summary |
+| `GET` | `/tools/:id/versions` | — | Version history for a tool |
+| `POST` | `/tools/:id/versions` | manage tool | Append a version record |
+| `GET` | `/roles` | — | List roles |
+| `POST` | `/roles` | manage `*` | Create a role |
+| `POST` | `/roles/:id/permissions` | manage `*` | Add permission to a role |
+| `POST` | `/roles/:id/assign` | manage `*` | Assign role to a principal |
+| `GET` | `/principals/:id/permissions` | — | List a principal's resolved permissions |
+
+`requirePermission` resolves the resource from the request (body or path param) and calls `rbac.isAllowed(principalId, resource, action)`. The `resource` value `"*"` matches any wildcard permission.
 
 ### Module responsibilities
 

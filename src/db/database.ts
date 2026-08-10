@@ -103,4 +103,26 @@ export const store = {
     }
     rows[idx] = Object.assign({}, rows[idx], updates);
     save(table);
-    return
+    return rows[idx];
+  },
+  remove(table: TableName, id: string): boolean {
+    const rows = load(table);
+    const idx = findIndexById(rows, id);
+    if (idx === -1) {
+      return false;
+    }
+    rows.splice(idx, 1);
+    save(table);
+    return true;
+  },
+  removeWhere(table: TableName, predicate: (row: any) => boolean): number {
+    const rows = load(table);
+    const before = rows.length;
+    const remaining = rows.filter(function (r) {
+      return !predicate(r);
+    });
+    cache.set(table, remaining);
+    save(table);
+    return before - remaining.length;
+  },
+};
