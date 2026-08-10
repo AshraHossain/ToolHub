@@ -58,3 +58,27 @@ curl -X POST -H "x-principal-id: admin-user" -H "Content-Type: application/json"
 - `POST /invoke` and `/servers/:id/refresh` are mocked — a production version would use `@modelcontextprotocol/sdk` to connect to each registered server's transport (`stdio`/`sse`/`http`) and proxy real `tools/call` / `tools/list` requests.
 - JSON-file storage (`src/db/database.ts`) is a drop-in stand-in for a real database; swap `store` for a SQL-backed implementation without changing module APIs.
 - Health checks run on a 60s interval via `startHealthMonitor()`.
+
+## Framework
+
+ToolHub follows the SuperClaude Framework project structure:
+
+- [`PLANNING.md`](PLANNING.md) — architecture, module responsibilities, and design constraints (source of truth, kept in sync with `CLAUDE.md`)
+- [`TASK.md`](TASK.md) — priority-ordered task list
+- [`plugins/`](plugins/README.md) — reserved extension point for a real `@modelcontextprotocol/sdk` transport adapter and other integrations
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — development setup and contribution workflow
+
+## Getting Started
+
+```bash
+npm install
+npm run dev    # ts-node, no compile step — http://localhost:3000
+```
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup and workflow.
+
+## License
+
+Proprietary. See [LICENSE](LICENSE). All rights reserved.
