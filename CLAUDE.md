@@ -105,3 +105,19 @@ Agent → POST /invoke (x-principal-id header)
 - **JSON-file storage** — `store` in `src/db/database.ts` is the only persistence abstraction; it keeps an in-memory cache and flushes to `data/<table>.json` on every write. The `data/` directory is created on `initSchema()`.
 - **Principal identity is a plain string header** — `x-principal-id` is not validated or cryptographically verified. RBAC logic is real but auth is intentionally minimal for the MVP.
 - **Approval gating** — `riskLevel: "high"` or `"medium"` tools require a separate `POST /approvals` + admin decision before `POST /invoke` succeeds for a given principal.
+
+## Framework conventions
+
+This project follows the SuperClaude Framework structure adopted across the
+portfolio:
+
+- **`PLANNING.md`** is the source-of-truth architecture doc — keep it in
+  sync with the Architecture section of this file when either changes.
+- **`TASK.md`** holds the priority-ordered task list; check it before
+  picking up new work.
+- **`plugins/`** is the reserved extension point for replacing the mocked
+  MCP invocation with a real `@modelcontextprotocol/sdk` transport adapter —
+  see `plugins/README.md`.
+- **`CONTRIBUTING.md`** documents the development setup (`npm install`,
+  `npm run dev`/`npm run build`) for contributors.
+- Line endings are pinned to LF via `.gitattributes`.
