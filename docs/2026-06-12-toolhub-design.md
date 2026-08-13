@@ -1,5 +1,11 @@
 # ToolHub — MCP Tool Registry & Marketplace
 
+> **Implementation note:** this is the original design doc; two details below
+> shipped differently. Storage is JSON-file-based (`src/db/database.ts`), not
+> SQLite/better-sqlite3. The `/discover` endpoint takes `tag`/`serverId`/`query`
+> params, not `tag`/`server`/`capability`. See [PLANNING.md](../PLANNING.md)
+> for the current, code-derived architecture.
+
 ## Elevator Pitch
 ToolHub is an MCP-native registry where agents (e.g. NexusAI) dynamically discover, authenticate to, and invoke tools exposed by registered MCP servers — with governance (RBAC, approvals, health, versioning, analytics) built in.
 
